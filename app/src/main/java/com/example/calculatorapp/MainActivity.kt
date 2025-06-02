@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.snackbar.Snackbar
 import org.mariuszgromada.math.mxparser.Expression
 
 class MainActivity : AppCompatActivity() {
@@ -46,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         val btnMultiplication = findViewById<Button>(R.id.multiplication)
         val btnDivide = findViewById<Button>(R.id.divide)
         val btnPercent = findViewById<Button>(R.id.percent)
-        val btnSwitchSignal = findViewById<Button>(R.id.switchSignal)
+        val btnBracket = findViewById<Button>(R.id.brackets)
         val btnClean = findViewById<Button>(R.id.Clean)
 
         tvCalculation = findViewById(R.id.tv_valuesTyped)
@@ -74,7 +75,7 @@ class MainActivity : AppCompatActivity() {
             btnEqual to "=",
             btnDecimal to ".",
             btnClean to "Clean",
-            btnSwitchSignal to "±",
+            btnBracket to "()",
             btnBackspace to "backspace"
         )
 
@@ -99,10 +100,11 @@ class MainActivity : AppCompatActivity() {
         funcButtonsMap.forEach { (button, value) ->
             button.setOnClickListener {
 
+                selectedOperation = value.toString()
                 when (value) {
                     "=" -> showResult()
                     "Clean" -> cleanAll()
-                    "±" -> swithSignal()
+                    "()" -> brackets()
                     "backspace" -> backspace()
                     else -> {
                         selectedOperation = value.toString()
@@ -153,23 +155,41 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun showResult() {
-        val result = Expression(tvCalculation.text.toString()).calculate()
-        tvResult.text = result.toString()
-    }
-
-    private fun cleanAll() {
         val actualText = tvCalculation.text.toString()
-        val actualResult = tvResult.text.toString()
-
-        if( actualText.isNotEmpty() ){
-            tvCalculation.text = ""
-        }else if (actualResult.isNotEmpty()){
-            tvResult.text = ""
+        val FixedExpression = actualText.replace("x","*")
+        val result = Expression(FixedExpression).calculate()
+        if (result.isNaN()) {
+            Snackbar.make(
+                tvResult,
+                "Invalid expression!",
+                Snackbar.LENGTH_LONG
+            ).show()
+        } else {
+            tvResult.text = result.toString()
         }
     }
 
-    private fun swithSignal() {
-        tvCalculation.append(selectedOperation)
+    private fun cleanAll() {
+        tvCalculation.text = ""
+        tvResult.text = ""
+    }
+
+    private fun brackets() {
+        val actualText = tvCalculation.text.toString()
+        val lastChar = actualText.lastOrNull().toString()
+        val open = actualText.count { it == '('}
+        val close = actualText.count {it == ')'}
+        val operation = listOf("x","-","+","÷","(")
+        val canOpenMore = operation.contains(lastChar)
+
+        if ( open > close && canOpenMore) {
+            tvCalculation.append("(")
+        }
+        else if (open > close) {
+            tvCalculation.append(")")
+        } else {
+            tvCalculation.append("(")
+        }
     }
 
     private fun backspace() {
