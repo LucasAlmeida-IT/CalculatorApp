@@ -80,13 +80,13 @@
                 android:text="C" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/switchSignal"
+                android:id="@+id/brackets"
                 style="@style/topbuttons"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/topbuttons"
                 android:gravity="center_vertical"
-                app:icon="@drawable/sign_plus_minus"
+                android:text="()"
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
                 app:iconTint="@color/black"
